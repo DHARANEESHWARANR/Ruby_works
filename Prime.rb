@@ -8,18 +8,18 @@ def Prime(num)
 		puts "Not a prime number"
 	end
 
-    count=0
-    (1..num).each do |i|
-    	if num%i==0
-    		count=count+1
-    	end
-    end
+	count=0
+	(1..num).each do |i|
+		if num%i==0
+			count=count+1
+		end
+	end
 
-    if count==2
-    	puts "The number is Prime number"
-    else
-    	puts "The number is not Prime"
-    end
+	if count==2
+		puts "The number is Prime number"
+	else
+		puts "The number is not Prime"
+	end
    end
 
    Prime(num)

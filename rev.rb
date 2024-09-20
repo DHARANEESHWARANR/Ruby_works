@@ -1,7 +1,5 @@
 puts "Enter the String:"
-
 abc=gets.chomp
-
 def rev_b(str)
 	return str.reverse
 end
