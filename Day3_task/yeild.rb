@@ -21,7 +21,7 @@ def greet(name)
   puts "Hello #{name}"
 
   if block_given?
-    yield("Asvin")
+    #yield("Asvin")
   end
 
   puts "function completed"

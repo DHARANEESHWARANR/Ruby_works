@@ -1,7 +1,7 @@
 # Open the String class and modify it
 class String
   def reverse
-    puts "Dharaneeshwaran R"
+     "Dharaneeshwaran R"
   end
 end
 
@@ -11,4 +11,4 @@ end
 my_string = "Hello"
 
 
-my_string.reverse
+puts  my_string.reverse
