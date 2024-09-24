@@ -100,6 +100,7 @@ class Main
     end
 
     def update_main(exchanges)
+      @@denomination_used = []
       temp_exchange = exchanges
       puts " "
       sorted_hash = @@store
