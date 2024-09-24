@@ -178,63 +178,61 @@ class Main
     end
 
    def customer_denominations_calculations(amount_given)
-  index = 0
-  @@store.each do |key, value| 
-    current_val = key.split.first.to_i
-    if current_val > amount_given
-      index += 1
-    else 
-      break
-    end
-  end 
-  puts " "
-  
-  sum = 0
-  while sum != amount_given
-    @@customer_denominations = Array.new(10, 0)
-    sum = 0
-    puts "Enter the denominations for respectives Notes or Coins"
-    iterator = 0
-    
-    @@store_array.each do |str|
-      if iterator < index
-        iterator += 1
-        next
+    index = 0
+    @@store.each do |key, value| 
+      current_val = key.split.first.to_i
+      if current_val > amount_given
+        index += 1
+      else 
+        break
       end
+    end 
+    puts " "
+    sum = 0
+    while sum != amount_given
+      @@customer_denominations = Array.new(10, 0)
+      sum = 0
+      puts "Enter the denominations for respectives Notes or Coins"
+      iterator = 0
+      @@store_array.each do |str|
+        if iterator < index
+          iterator += 1
+          next
+        end
 
-      puts "Enter no of #{str}: "
-      total_notes = gets.chomp.to_i
-      @@customer_denominations[iterator] = total_notes
-      sum += total_notes * (str.split.first.to_i)
+        puts "Enter no of #{str}: "
+        total_notes = gets.chomp.to_i
+        @@customer_denominations[iterator] = total_notes
+        sum += total_notes * (str.split.first.to_i)
 
       # If the sum matches the amount given, break out of the loop.
-      if sum == amount_given
-        puts " "
-        puts "Correct Denominations Entered"
-        puts " "
-        #update the total amount
-        break  # Exit the loop immediately when the correct amount is entered.
-      elsif sum > amount_given
-        puts "Amount is exceeding. Please Enter the Correct Denominations"
-        break  # Exit to retry input when amount exceeds.
+        if sum == amount_given
+          puts " "
+          puts "Correct Denominations Entered"
+          puts " "
+          #update the total amount
+          break  # Exit the loop immediately when the correct amount is entered.
+        elsif sum > amount_given
+          puts "Amount is exceeding. Please Enter the Correct Denominations"
+          break  # Exit to retry input when amount exceeds.
+        end
+
+        iterator += 1
       end
 
-      iterator += 1
+      if sum == amount_given
+        break  # Exit the outer while loop when the correct sum is entered.
+      end
     end
-
-    if sum == amount_given
-      break  # Exit the outer while loop when the correct sum is entered.
-    end
-  end
 
   # Update the store based on the provided denominations
-  i = 0
-  @@store.each do |key, value|
-    value_of_array = @@customer_denominations[i]
-    @@store[key] = @@store[key] + value_of_array
-    i += 1
+    i = 0
+    @@store.each do |key, value|
+      value_of_array = @@customer_denominations[i]
+      @@store[key] = @@store[key] + value_of_array
+      i += 1
+    end
   end
-end
 
 
     
