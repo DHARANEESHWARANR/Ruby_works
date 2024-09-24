@@ -72,14 +72,23 @@ class Main
 
     #gettting amount of exchange
     def get_info_from_users
-
-      puts "Enter the Total_Amount Of Bill  : "
-      amount_paid = gets.chomp.to_i
-      puts " "
-      puts "Enter the Amount given By customers : "
-      amount_given = gets.chomp.to_i
-      #calculate the exchange
-      exchange = amount_given - amount_paid
+      while true  
+        puts "Enter the Total_Amount Of Bill  : "
+        amount_paid = gets.chomp.to_i
+        puts " "
+        puts "Enter the Amount given By customers : "
+        amount_given = gets.chomp.to_i
+        #calculate the exchange
+        exchange = amount_given - amount_paid
+        if exchange < 0
+          puts "Please provide some extra money"
+        elsif exchange == 0
+          puts "The Process completed"
+          return
+        else
+          break
+        end
+      end
       updated_info(exchange,amount_given)
 
     end
@@ -90,7 +99,7 @@ class Main
       @@exchange_global = exchange
       puts " "
       ## code to main logic
-      if @@total_amount+6 < exchange
+      if @@total_amount < exchange
         puts "There is no more exchange"
         puts " "
         return
