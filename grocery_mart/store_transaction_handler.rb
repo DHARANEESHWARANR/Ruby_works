@@ -5,26 +5,35 @@ class Main
   @@denomination_used = []
   @@store_array = ["2000rs Notes","500rs Notes","100rs Notes","50rs Notes","20rs Notes","20rs coins","10rs Notes","10rs coins","2rs coins","1rs coins"]
   @@customer_denominations = []
-
+  @@exchange_global = 0;
   def switch_functions
     while true
       puts " "
       puts "Enter Your Choice According To The Mentiones : "
-      puts "Enter 1 ->> Start the Process "
+      puts "Enter 1 ->> Start the Process and enter the denominations "
       puts "Enter 2 ->> Get_info From Customers and Workings"
       puts "Enter 3 ->> To Display The Store Details"
-      puts "Enter 4 ->> To exit From The Process"
+      puts "Enter 4 ->> To get Total Amount"
+      puts "Enter 5 ->> To exit From The Process"
       choice = gets.chomp.to_i
       if choice == 1
         get_info
       elsif choice == 2
         get_info_from_users
-      elsif choice ==3
+      elsif choice == 3
         display_info(@@store)
-      elsif choice ==4
+      elsif choice == 4
+        display_total_Amount
+      elsif choice == 5
         break
+      else
+        puts "Please enter the valid Number from above "
       end
     end
+  end
+
+  def display_total_Amount
+    puts "The Total Amount Available in the Trans_Box is #{@@total_amount}"
   end
 
   def get_info
@@ -42,15 +51,28 @@ class Main
     
     #displaying the available denominations
     def display_info(store)
+      if store.empty?
+        puts "The Store Trans_Box is not loaded"
+        return
+      end
       puts "The available denominations are: "
       puts " "
       store.each do |key, value|
         puts "| #{key.ljust(12)} = #{value.to_s.ljust(4)} |"
       end
+
+      #initialiing total amount
+      @@total_amount = 0
+      #updating the total amount
+      store.each do |key,value|
+        @@total_amount += (key.split.first.to_i)*(value)
+      end
+
     end
 
     #gettting amount of exchange
     def get_info_from_users
+
       puts "Enter the Total_Amount Of Bill  : "
       amount_paid = gets.chomp.to_i
       puts " "
@@ -58,7 +80,6 @@ class Main
       amount_given = gets.chomp.to_i
       #calculate the exchange
       exchange = amount_given - amount_paid
-
       updated_info(exchange,amount_given)
 
     end
@@ -66,7 +87,7 @@ class Main
 
     #calculating for validation
     def updated_info(exchange,amount_given)
-      puts "The values wants to be exchange is : #{exchange}"
+      @@exchange_global = exchange
       puts " "
       ## code to main logic
       if @@total_amount+6 < exchange
@@ -80,7 +101,6 @@ class Main
 
     def update_main(exchanges)
       temp_exchange = exchanges
-      puts "The Available amount  is #{@@total_amount}"
       puts " "
       sorted_hash = @@store
       sorted_hash.each do |key,value|
@@ -99,20 +119,10 @@ class Main
           @@denomination_used << value
 
           #main_logic
-
-          if @@notes_count == 10 and exchanges!=0
-            puts "The remaining amount is #{exchanges}"
-            puts " "
-            puts "Collect Chocolates for #{exchanges}rs"
-            exchanges = 0
-
-          end
           if exchanges == 0
             puts "Process Completed"
             puts " "
             transaction_details(@@denomination_used)
-    
-           
             return 
           end
 
@@ -127,31 +137,26 @@ class Main
 
           #inserting the denominations
           @@denomination_used << denominations
-          if @@notes_count == 10 and exchanges !=0
-            puts "There is No denominations"
-            return 
-          end
-          if @@notes_count == 10 and exchanges!=0
-            puts "the remaining is #{exchanges}"
-            puts " "
-            puts "Collect Chocolates for #{exchanges}rs"
-            exchanges = 0
-          end
+
           if exchanges == 0 
             puts " "
             puts "Process Completed"
             puts " "
+            puts "printing denoms : "
             transaction_details(@@denomination_used)
-            
             return
           end
         end
       end
+      if  exchanges !=0
+        puts "Sorry Correct exchange is Not available"
+        return 
+      end 
       @@store = sorted_hash
-
     end
 
     def transaction_details(arr)
+      puts "The rerturn exchange wants to be given : #{@@exchange_global}"
       puts " "
       puts "The Return Denominations Given To The Customer : "
       puts " "
@@ -194,8 +199,10 @@ class Main
 
       # If the sum matches the amount given, break out of the loop.
       if sum == amount_given
+        puts " "
         puts "Correct Denominations Entered"
         puts " "
+        #update the total amount
         break  # Exit the loop immediately when the correct amount is entered.
       elsif sum > amount_given
         puts "Amount is exceeding. Please Enter the Correct Denominations"
@@ -213,8 +220,8 @@ class Main
   # Update the store based on the provided denominations
   i = 0
   @@store.each do |key, value|
-    value = @@customer_denominations[i]
-    @@store[key] = @@store[key] + value
+    value_of_array = @@customer_denominations[i]
+    @@store[key] = @@store[key] + value_of_array
     i += 1
   end
 end
