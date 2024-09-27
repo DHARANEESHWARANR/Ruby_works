@@ -225,15 +225,9 @@ class Main
         end
         iterator += 1
       end
-      if sum == amount_given
-        break                                          # Exit the outer while loop when the correct sum is entered.
-      end
    end
   end
 
-  def is_Value_numeric?(number)
-    
-  end
 
 
  
