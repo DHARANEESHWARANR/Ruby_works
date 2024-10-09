@@ -45,7 +45,7 @@ class Wordle
   	  random_word = Faker::Lorem.word
   	  break if random_word.length == 5
   	end
-  	puts "Your 5-letter random word is: #{random_word}"
+  	puts "Your 5-letter random word is: #{random_word}"  #for reference to check
   	manage_attempts(random_word)
   end
 
