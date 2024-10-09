@@ -93,7 +93,7 @@ class Wordle
   	guess_word_arr.each_with_index do |char,index|
   		if char == random_word[index]
   			print "#{char} | ".green
-  		elsif random_word.include?(char)
+  		elsif random_word.include?(char) && guess_word.count(char) <= random_word.count(char)
   			print "#{char}| ".yellow
   		else
   			print "#{char} | ".red
