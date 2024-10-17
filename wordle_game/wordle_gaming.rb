@@ -1,22 +1,23 @@
+require 'httparty'
+require 'faker'
+require 'colorize'
+require 'socket'
 
 class Wordle
-	require 'httparty'
-	require 'faker'
-	require 'colorize'
-	def display_choices
+	def display_game_menu   # 1c
 		while true
       puts " "
       puts "Enter Your Choice According To The Below Mentioned : "
       puts "Enter 1 ->> To Read The Instructions About The Game "
       puts "Enter 2 ->> To Start  The Game"
       puts "Enter 3 ->> To Exit From The Game"
-      choice = gets.chomp.to_i
-      if choice == 1
+      user_choice = gets.chomp.to_i
+      if user_choice == 1
       	display_instructions
-      elsif choice == 2
-      	@@array = ("A".."Z").to_a
-      	start_gaming
-      elsif choice == 3 
+      elsif user_choice == 2
+      	@@letter_statuses = ("A".."Z").to_a
+      	start_game
+      elsif user_choice == 3 
       	break
       else
         puts "!Invalid Number Entered"
@@ -36,104 +37,113 @@ class Wordle
     puts "\nGood luck, and have fun playing!\n".green
   end
 
-  # def start_game
-  # 	#Loop until a 5-letter word is generated
-  # 	puts "\n--- Game Started , Get Ready Folks ---\n\n".blue
-  # 	random_word = ''
-  # 	loop do
-  # 	  random_word = Faker::Lorem.word
-  # 	  break if random_word.length == 5 
-  # 	end
-  # 	puts "Your 5-letter random word is: #{random_word}"  #for reference to check
-  # 	manage_attempts(random_word)
-  # end
-
-  #above is randomely generating availble 5 letter word
-
-  def start_gaming
+  def start_game
   	words = File.readlines('words.txt').map(&:chomp)
-  	filtered_word = words.select{|word| word.length == 5}
-  	random_word = filtered_word.sample
-  	puts "The Random Word Generated Is : #{random_word}"
-  	manage_attempts(random_word)
+  	filtered_five_letter_wordrs = words.select{|word| word.length == 5}
+  	random_word_generated = filtered_word.sample
+  	puts "The Random Word Generated Is : #{random_word_generated}"
+  	getting_user_guesses(random_word_generated)
   end
 
-  def manage_attempts(random_word)
+  def getting_user_guesses(random_word)         #2c
     number_of_chances = 5
     (1..number_of_chances).each do |current_chance|
       puts "\nChance #{current_chance}:"
       print "Enter the Word You Guess: "
       guess_word = gets.chomp
-      if guess_word.length != 5
+      status_of_evaluation = evaluate_user_guesses(guess_word)
+      if status_of_evaluation == "redo"
+      	redo  
+      elsif status_of_evaluation == "success"
+      	return 
+    end
+    puts "Sorry, You Lose The Game.".red
+    puts "The Correct Word is #{random_word}."
+  end
+  
+  def evaluate_user_guesses(guess_word)
+  	if guess_word.length != 5
         puts "! Invalid Word Length. Enter a 5 Letter Word.".red
-        next
+        return "redo"
       elsif random_word == guess_word
         puts "Congratulations! You Guessed The Word.".green
         puts "You Are A Winner.".green
-        return
+        return "success"
       elsif valid_five_letter_word?(guess_word)
         provide_feedback(random_word, guess_word)
       else
         puts "The Guess Word does not exist in the dictionary.".red
         puts "Enter a valid 5-letter English word.".red
-        next
+        return "redo"
       end
-    end
-    puts "Sorry, You Lose The Game.".red
-    puts "The Correct Word is #{random_word}."
   end
 
-  def provide_feedback(random_word,guess_word)
-  	frequency = random_word.chars.each_with_object(Hash.new(0)) { |letter, counts| counts[letter] += 1 }
-  	puts "Your guess: #{guess_word} was evaluated. Here's the breakdown:".blue
-  	puts "--------------------"
-  	guess_word_arr = guess_word.split("")
-  	guess_word_arr.each_with_index do |char,index|
-  		if char == random_word[index] 
-  			frequency[char] = frequency[char] -1
-  			@@array[char.ord - 97] = @@array[char.ord - 97].green
-  			print "#{char} | ".green
-  		elsif random_word.include?(char) && frequency[char] >=1
-  			frequency[char] = frequency[char] -1
-  			@@array[char.ord - 97] = @@array[char.ord - 97].yellow
-  			print "#{char}| ".yellow
-  		else
-  			@@array[char.ord - 97] = @@array[char.ord - 97].red
-  			print "#{char} | ".red
-  		end
-  	end
-  	puts "\n"
-  	puts "--------------------"
-  	display_alpha_board
-  		puts "Use the above feedback to refine your next guess!".blue
-  end
   
   def valid_five_letter_word?(word)
    word.match?(/^[a-zA-Z]+$/) && word_exists?(word)
   end
 
   def word_exists?(word)
-   response = HTTParty.get("https://api.dictionaryapi.dev/api/v2/entries/en/#{word}")
-   response.code == 200
+   if internet_connected?
+   	response = HTTParty.get("https://api.dictionaryapi.dev/api/v2/entries/en/#{word}")
+   	return response.code == 200
+   else
+   	puts "Internet Is Not Connected"
+   end
   end
 
-  def display_alpha_board
+  def display_letter_statuses         #3c
   	puts ""
-    count = 0
-    for arr in @@array
+    character_count = 0                      
+    for character in @@letter_statuses         #4c
       if count <10
-        print "#{arr} | "
-        count =count+1   
+        print "#{character} | "
+        character_count =character_count+1   
       else 
-        count = 0
+        character_count = 0
         puts " "
       end
     end
     puts ""
   end
 
+  def internet_connected?
+  	begin
+    # Open a TCP connection to Google's DNS server (8.8.8.8) on port 53
+    Socket.tcp("8.8.8.8", 53, connect_timeout: 5).close
+    true
+    rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH, Errno::ETIMEDOUT
+    false
+  end
+  end
+
+  def provide_feedback(random_word,guess_word)
+  	frequency_of_letters = random_word.chars.each_with_object(Hash.new(0)) { |letter, counts| counts[letter] += 1 }
+  	puts "Your guess: #{guess_word} was evaluated. Here's the breakdown:".blue
+  	puts "--------------------"
+  	guess_word_array = guess_word.split("")
+  	guess_word_array.each_with_index do |char,index|
+  		if char == random_word[index] 
+  			frequency_of_letters[char] = frequency_of_letters[char] -1
+  			@@letter_statuses[char.ord frequency_of_letters- 97] = @@letter_statuses[char.ord - 97].green
+  			print "#{char} | ".greens
+  		elsif random_word.include?(char) && frequency[char] >=1
+  			frequency_of_letters[char] = frequency_of_letters[char] -1
+  			@@letter_statuses[char.ord - 97] = @@letter_statuses[char.ord - 97].yellow
+  			print "#{char}| ".yellow
+  		else
+  			@@letter_statuses[char.ord - 97] = @@letter_statuses[char.ord - 97].red
+  			print "#{char} | ".red
+  		end
+  	end
+  	puts "\n"
+  	puts "--------------------"
+  	display_letter_statuses
+  		puts "Use the above feedback to refine your next guess!".blue
+  end
+
 end
 
 game_obj = Wordle.new
 
-game_obj.display_choices
+game_obj.display_game_menu
