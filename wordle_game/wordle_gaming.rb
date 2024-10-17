@@ -38,12 +38,15 @@ class Wordle
   end
 
   def start_game
+
   	words = File.readlines('words.txt').map(&:chomp)
-  	filtered_five_letter_wordrs = words.select{|word| word.length == 5}
-  	random_word_generated = filtered_word.sample
+  	filtered_five_letter_words = words.select{|word| word.length == 5}
+  	random_word_generated = filtered_five_letter_words.sample
   	puts "The Random Word Generated Is : #{random_word_generated}"
   	getting_user_guesses(random_word_generated)
+ 
   end
+
 
   def getting_user_guesses(random_word)         #2c
     number_of_chances = 5
@@ -51,29 +54,35 @@ class Wordle
       puts "\nChance #{current_chance}:"
       print "Enter the Word You Guess: "
       guess_word = gets.chomp
-      status_of_evaluation = evaluate_user_guesses(guess_word)
+      status_of_evaluation = evaluate_user_guesses(guess_word,random_word)
       if status_of_evaluation == "redo"
       	redo  
       elsif status_of_evaluation == "success"
       	return 
+      end
     end
     puts "Sorry, You Lose The Game.".red
     puts "The Correct Word is #{random_word}."
   end
   
-  def evaluate_user_guesses(guess_word)
-  	if guess_word.length != 5
-        puts "! Invalid Word Length. Enter a 5 Letter Word.".red
+
+  def evaluate_user_guesses(guess_word,random_word)
+      if guess_word.match?(/^\d+$/)
+        puts "Unfortunately You enter the number. Try again.".yellow
+      	return "redo"
+      elsif guess_word.match?(/^(?=.*[a-zA-Z])(?=.*\d)/)
+      	puts "Oops! Your word contains both letters and numbers (e.g., #{guess_word}). Please enter a valid 5-letter word without numbers.".yellow
         return "redo"
-      elsif random_word == guess_word
-        puts "Congratulations! You Guessed The Word.".green
-        puts "You Are A Winner.".green
+  	  elsif guess_word.length !=5
+  	  	guess_word.length == 0 ? (puts "Oops! You forgot to enter a word. Try again.").yellow : (puts "Invalid Word And length mismatch! Please enter exactly 5 letters.").yellow
+  	  	return "redo"
+  	  elsif random_word == guess_word
+        puts "Congratulations! You Guessed The Word.\nYou Are A Winner.".green
         return "success"
       elsif valid_five_letter_word?(guess_word)
         provide_feedback(random_word, guess_word)
       else
-        puts "The Guess Word does not exist in the dictionary.".red
-        puts "Enter a valid 5-letter English word.".red
+        puts "The Guess Word does not exist in the dictionary.\n Enter a valid 5-letter  word".red
         return "redo"
       end
   end
@@ -92,11 +101,12 @@ class Wordle
    end
   end
 
+
   def display_letter_statuses         #3c
   	puts ""
     character_count = 0                      
     for character in @@letter_statuses         #4c
-      if count <10
+      if character_count <10
         print "#{character} | "
         character_count =character_count+1   
       else 
@@ -106,6 +116,7 @@ class Wordle
     end
     puts ""
   end
+
 
   def internet_connected?
   	begin
@@ -117,6 +128,7 @@ class Wordle
   end
   end
 
+
   def provide_feedback(random_word,guess_word)
   	frequency_of_letters = random_word.chars.each_with_object(Hash.new(0)) { |letter, counts| counts[letter] += 1 }
   	puts "Your guess: #{guess_word} was evaluated. Here's the breakdown:".blue
@@ -125,9 +137,9 @@ class Wordle
   	guess_word_array.each_with_index do |char,index|
   		if char == random_word[index] 
   			frequency_of_letters[char] = frequency_of_letters[char] -1
-  			@@letter_statuses[char.ord frequency_of_letters- 97] = @@letter_statuses[char.ord - 97].green
-  			print "#{char} | ".greens
-  		elsif random_word.include?(char) && frequency[char] >=1
+  			@@letter_statuses[char.ord - 97] = @@letter_statuses[char.ord - 97].green
+  			print "#{char} | ".green
+  		elsif random_word.include?(char) && frequency_of_letters[char] >=1
   			frequency_of_letters[char] = frequency_of_letters[char] -1
   			@@letter_statuses[char.ord - 97] = @@letter_statuses[char.ord - 97].yellow
   			print "#{char}| ".yellow
