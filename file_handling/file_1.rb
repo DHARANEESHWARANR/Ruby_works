@@ -1,5 +1,5 @@
 require 'date'
-require 'benchmark'  # Import Benchmark module
+require 'benchmark' 
 
 csv_file = "large_data_1.csv"
 
@@ -8,7 +8,7 @@ Benchmark.bm do |x|
   # Step 1: Generate the original CSV file with random dates
   x.report("Creating CSV file:") do
     File.open(csv_file, "w") do |file|
-      file.puts "ID,Date"  # Add headers
+      file.puts "ID,Date"  
       (1..5_000_000).each do |i|
         random_date = Date.today - rand(0..365)  
         formatted_date = random_date.strftime("%Y-%m-%d")  
@@ -45,7 +45,7 @@ Benchmark.bm do |x|
         id, date = line.strip.split(',')
         if date
           date_object = Date.parse(date)
-          formatted_date = date_object.strftime("%b %d")  # Example: "Jan 01"
+          formatted_date = date_object.strftime("%b %d")  
           updated_lines << "#{id},#{formatted_date}"  
         else
           updated_lines << line.strip  

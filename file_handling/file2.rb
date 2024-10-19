@@ -45,7 +45,7 @@ Benchmark.bm do |x|
         id, date = line.strip.split(',')
         if date
           date_object = Date.parse(date)
-          formatted_date = date_object.strftime("%b %d")  # Example: "Jan 01"
+          formatted_date = date_object.strftime("%b %d")  
           updated_lines << "#{id},#{formatted_date}"
         else
           updated_lines << line.strip  
